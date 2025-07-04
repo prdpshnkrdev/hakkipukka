@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Image from "next/image";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,16 +25,60 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <header>
-          <h1 className="text-5xl text-center p-8 bg-blue-500 text-white">
-            Hello
-          </h1>
-        </header>
-        {children}
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col`}
+      >
+        <div className="flex-grow">
+          <header className="bg-white shadow sticky top-0 z-50">
+            <div className="max-w-screen-xl mx-auto pl-4 sm:pl-6 lg:pl-8">
+              <div className="flex justify-between items-center h-16">
+                {/* Logo and Site Name */}
+                <div className="flex items-center space-x-2">
+                  <span className="text-xl font-bold text-green-800">
+                    Birding
+                  </span>
+                </div>
+
+                {/* Center Nav Links */}
+                <nav className="hidden md:flex space-x-6 text-sm font-medium text-gray-700">
+                  <a href="#" className="hover:text-blue-600">
+                    Submit
+                  </a>
+                  <a href="#" className="hover:text-blue-600">
+                    Explore
+                  </a>
+                  <a href="#" className="hover:text-blue-600">
+                    My Birds
+                  </a>
+                  <a href="#" className="hover:text-blue-600">
+                    About
+                  </a>
+                </nav>
+
+                {/* Right Utility Links */}
+                <div className="flex items-center space-x-2">
+                  <a href="#" className="hover:text-blue-600">
+                    Help
+                  </a>
+                  <a href="#" className="hover:text-blue-600">
+                    Sign in
+                  </a>
+                  <Image
+                    src="/logo.svg"
+                    alt="Logo"
+                    width={60}
+                    height={60}
+                    className="h-16 w-auto"
+                  />
+                </div>
+              </div>
+            </div>
+          </header>
+          {children}
+        </div>
         <footer>
           <p className="text-center p-4 bg-gray-200">
-            © {new Date().getFullYear()} My Next.js App
+            © {new Date().getFullYear()} Birding 🦜
           </p>
         </footer>
       </body>
