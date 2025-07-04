@@ -35,7 +35,7 @@ export default function RootLayout({
                 {/* Logo and Site Name */}
                 <div className="flex items-center space-x-2">
                   <span className="text-xl font-bold text-green-800">
-                    Birding
+                    HakkiPukka
                   </span>
                 </div>
 
@@ -51,15 +51,18 @@ export default function RootLayout({
                     My Birds
                   </a>
                   <a href="#" className="hover:text-blue-600">
+                    News
+                  </a>
+                  <a href="#" className="hover:text-blue-600">
                     About
                   </a>
                 </nav>
 
                 {/* Right Utility Links */}
                 <div className="flex items-center space-x-2">
-                  <a href="#" className="hover:text-blue-600">
+                  {/* <a href="#" className="hover:text-blue-600">
                     Help
-                  </a>
+                  </a> */}
                   <a href="#" className="hover:text-blue-600">
                     Sign in
                   </a>
@@ -78,7 +81,7 @@ export default function RootLayout({
         </div>
         <footer>
           <p className="text-center p-4 bg-gray-200">
-            © {new Date().getFullYear()} Birding 🦜
+            © {new Date().getFullYear()} HakkiPukka 🐦
           </p>
         </footer>
       </body>
