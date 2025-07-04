@@ -25,7 +25,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <header>
+          <h1 className="text-5xl text-center p-8 bg-blue-500 text-white">
+            Hello
+          </h1>
+        </header>
         {children}
+        <footer>
+          <p className="text-center p-4 bg-gray-200">
+            © {new Date().getFullYear()} My Next.js App
+          </p>
+        </footer>
       </body>
     </html>
   );
