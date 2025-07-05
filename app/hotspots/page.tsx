@@ -13,6 +13,8 @@ export default function HotspotsPage() {
   const [selectedLocation, setSelectedLocation] = useState<
     [number, number] | null
   >(null);
+  const [radius, setRadius] = useState<number>(25); // in kilometers
+  const [search, setSearch] = useState<string>("");
 
   const MapUpdater = ({ center }: { center: [number, number] }) => {
     const map = useMap();
@@ -23,46 +25,84 @@ export default function HotspotsPage() {
   };
 
   useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const data = await fetchHotspots(lat, lng);
-            setHotspots(data);
-          } catch (err) {
-            setError("Failed to load hotspots.");
+    const getHotspots = async () => {
+      try {
+        const coords = await new Promise<GeolocationCoordinates>(
+          (resolve, reject) => {
+            if (!navigator.geolocation) {
+              reject(new Error("Geolocation not supported."));
+            } else {
+              navigator.geolocation.getCurrentPosition(
+                (pos) => resolve(pos.coords),
+                () => reject(new Error("Location access denied."))
+              );
+            }
           }
-        },
-        async () => {
-          // Fallback to Bangalore coordinates
-          const defaultLat = 12.9716;
-          const defaultLng = 77.5946;
-          try {
-            const data = await fetchHotspots(defaultLat, defaultLng);
-            setHotspots(data);
-            setError(
-              "Location access denied. Showing default (Bangalore) hotspots."
-            );
-          } catch {
-            setError("Failed to load default hotspots.");
-          }
+        );
+
+        const lat = coords.latitude;
+        const lng = coords.longitude;
+        const data = await fetchHotspots(lat, lng, radius);
+        setHotspots(data);
+      } catch (err: any) {
+        // Fallback to Bangalore if denied or failed
+        const fallbackLat = 12.9716;
+        const fallbackLng = 77.5946;
+        try {
+          const data = await fetchHotspots(fallbackLat, fallbackLng, radius);
+          setHotspots(data);
+          setError(
+            (err.message || "Failed to load hotspots.") +
+              " Showing default (Bangalore) hotspots."
+          );
+        } catch {
+          setError("Failed to load hotspots.");
         }
-      );
-    } else {
-      setError("Geolocation not supported.");
-    }
-  }, []);
+      }
+    };
+
+    getHotspots();
+    // re-fetch when radius changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [radius]);
 
   const center =
     hotspots.length > 0
       ? [hotspots[0].lat, hotspots[0].lng]
       : [12.9716, 77.5946];
 
+  // Filter hotspots by search keyword
+  const filteredHotspots = hotspots.filter((spot) =>
+    spot.locName.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <section className="w-full mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Nearby Birding Hotspots</h1>
+      {/* Filter UI */}
+      <div className="flex flex-wrap gap-4 mb-6">
+        <div>
+          <label className="block text-sm font-medium">Search by Name</label>
+          <input
+            type="text"
+            className="border rounded px-2 py-1 w-full"
+            placeholder="E.g. Lalbagh"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Radius (km)</label>
+          <input
+            type="number"
+            className="border rounded px-2 py-1 w-24"
+            min={1}
+            max={100}
+            value={radius}
+            onChange={(e) => setRadius(Number(e.target.value))}
+          />
+        </div>
+      </div>
       {error && <p className="text-yellow-700">{error}</p>}
       {!error && hotspots.length === 0 && <p>Loading hotspots...</p>}
 
@@ -79,7 +119,7 @@ export default function HotspotsPage() {
               attribution="&copy; OpenStreetMap contributors"
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            {hotspots.map((spot) => (
+            {filteredHotspots.map((spot) => (
               <Marker key={spot.locId} position={[spot.lat, spot.lng]}>
                 <Popup>{spot.locName}</Popup>
               </Marker>
@@ -91,7 +131,7 @@ export default function HotspotsPage() {
         {/* Hotspot List Section - 1/3 width, scrollable */}
         <div className="h-[750px] overflow-y-auto pr-2">
           <div className="space-y-4">
-            {hotspots.map((spot: any) => (
+            {filteredHotspots.map((spot: any) => (
               <HotspotCard
                 key={spot.locId}
                 name={spot.locName}
