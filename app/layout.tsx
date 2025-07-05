@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <div className="flex-grow">
           <header className="bg-white shadow sticky top-0 z-50">
-            <div className="max-w-screen-xl mx-auto pl-4 sm:pl-6 lg:pl-8">
+            <div className="w-full px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 {/* Logo and Site Name */}
                 <div className="flex items-center space-x-2">

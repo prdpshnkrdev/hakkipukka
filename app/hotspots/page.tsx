@@ -17,7 +17,7 @@ export default function HotspotsPage() {
   const MapUpdater = ({ center }: { center: [number, number] }) => {
     const map = useMap();
     useEffect(() => {
-      map.setView(center, 13);
+      map.setView(center, 16);
     }, [center, map]);
     return null;
   };
@@ -61,7 +61,7 @@ export default function HotspotsPage() {
       : [12.9716, 77.5946];
 
   return (
-    <section className="max-w-screen-xl mx-auto px-4 py-8">
+    <section className="w-full mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Nearby Birding Hotspots</h1>
       {error && <p className="text-yellow-700">{error}</p>}
       {!error && hotspots.length === 0 && <p>Loading hotspots...</p>}

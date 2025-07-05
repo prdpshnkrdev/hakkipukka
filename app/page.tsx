@@ -24,7 +24,7 @@ export default function Home() {
       </section>
 
       {/* Content Section */}
-      <section className="max-w-screen-xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <section className="w-full mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* India News */}
         <div className="bg-white rounded shadow p-6">
           <h2 className="text-xl font-semibold mb-2">India News</h2>
