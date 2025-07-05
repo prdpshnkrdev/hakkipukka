@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import HotspotCard from "../components/HotspotCard";
-import { fetchHotspots } from "../lib/ebird";
+import { fetchHotspots, fetchSpeciesByHotspot } from "../lib/ebird";
 
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
@@ -15,6 +15,8 @@ export default function HotspotsPage() {
   >(null);
   const [radius, setRadius] = useState<number>(25); // in kilometers
   const [search, setSearch] = useState<string>("");
+  const [selectedSpecies, setSelectedSpecies] = useState<any[]>([]);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   const MapUpdater = ({ center }: { center: [number, number] }) => {
     const map = useMap();
@@ -138,12 +140,51 @@ export default function HotspotsPage() {
                 locId={spot.locId}
                 lat={spot.lat}
                 lng={spot.lng}
-                onClick={() => setSelectedLocation([spot.lat, spot.lng])}
+                onClick={async () => {
+                  setSelectedLocation([spot.lat, spot.lng]);
+                  const species = await fetchSpeciesByHotspot(spot.locId);
+                  setSelectedSpecies(species);
+                  setModalOpen(true);
+                }}
               />
             ))}
           </div>
         </div>
       </div>
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 max-w-lg w-full shadow-lg">
+            <h2 className="text-xl font-bold mb-4">
+              Species seen at{" "}
+              {
+                filteredHotspots.find(
+                  (h) =>
+                    [h.lat, h.lng].toString() === selectedLocation?.toString()
+                )?.locName
+              }
+            </h2>
+            {selectedSpecies.length > 0 ? (
+              <ul className="list-disc list-inside space-y-1 max-h-96 overflow-y-auto">
+                {selectedSpecies.map((s: any) => (
+                  <li key={s.speciesCode}>{s.comName}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-600">
+                No species data available at this location.
+              </p>
+            )}
+            <div className="mt-6 text-right">
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                onClick={() => setModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
