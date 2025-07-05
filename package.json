@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mui/icons-material": "^7.2.0",
     "@tailwindcss/postcss": "^4.1.11",
     "leaflet": "^1.9.4",
     "next": "15.3.5",

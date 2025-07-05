@@ -1,8 +1,10 @@
-export async function fetchHotspots(lat: number, lng: number) {
+export async function fetchHotspots(lat: number, lng: number, radius?: number) {
   const apiKey = process.env.NEXT_PUBLIC_EBIRD_API_KEY;
 
   const res = await fetch(
-    `https://api.ebird.org/v2/ref/hotspot/geo?lat=${lat}&lng=${lng}&fmt=json`,
+    `https://api.ebird.org/v2/ref/hotspot/geo?lat=${lat}&lng=${lng}&fmt=json${
+      radius ? `&radius=${radius}` : ""
+    }`,
     {
       headers: {
         "X-eBirdApiToken": apiKey!,

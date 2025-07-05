@@ -134,19 +134,21 @@ export default function HotspotsPage() {
         <div className="h-[750px] overflow-y-auto pr-2">
           <div className="space-y-4">
             {filteredHotspots.map((spot: any) => (
-              <HotspotCard
-                key={spot.locId}
-                name={spot.locName}
-                locId={spot.locId}
-                lat={spot.lat}
-                lng={spot.lng}
-                onClick={async () => {
-                  setSelectedLocation([spot.lat, spot.lng]);
-                  const species = await fetchSpeciesByHotspot(spot.locId);
-                  setSelectedSpecies(species);
-                  setModalOpen(true);
-                }}
-              />
+              <div key={spot.locId}>
+                <HotspotCard
+                  name={spot.locName}
+                  locId={spot.locId}
+                  lat={spot.lat}
+                  lng={spot.lng}
+                  directionsUrl={`https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`}
+                  onClick={async () => {
+                    setSelectedLocation([spot.lat, spot.lng]);
+                    const species = await fetchSpeciesByHotspot(spot.locId);
+                    setSelectedSpecies(species);
+                    setModalOpen(true);
+                  }}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -181,6 +183,14 @@ export default function HotspotsPage() {
               >
                 Close
               </button>
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${selectedLocation?.[0]},${selectedLocation?.[1]}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-4 inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Get Directions
+              </a>
             </div>
           </div>
         </div>
