@@ -6,6 +6,7 @@ import { fetchHotspots, fetchSpeciesByHotspot } from "../lib/ebird";
 
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import BirdImage from "../components/BirdImage";
 
 export default function HotspotsPage() {
   const [hotspots, setHotspots] = useState<any[]>([]);
@@ -144,6 +145,7 @@ export default function HotspotsPage() {
                   onClick={async () => {
                     setSelectedLocation([spot.lat, spot.lng]);
                     const species = await fetchSpeciesByHotspot(spot.locId);
+                    console.log("Fetched species:", species);
                     setSelectedSpecies(species);
                     setModalOpen(true);
                   }}
@@ -168,7 +170,10 @@ export default function HotspotsPage() {
             {selectedSpecies.length > 0 ? (
               <ul className="list-disc list-inside space-y-1 max-h-96 overflow-y-auto">
                 {selectedSpecies.map((s: any) => (
-                  <li key={s.speciesCode}>{s.comName}</li>
+                  <li key={s.speciesCode} className="flex items-center gap-3">
+                    <BirdImage comName={s.comName} />
+                    <span>{s.comName}</span>
+                  </li>
                 ))}
               </ul>
             ) : (
