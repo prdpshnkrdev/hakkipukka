@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import HotspotCard from "../components/HotspotCard";
 import { fetchHotspots, fetchSpeciesByHotspot } from "../lib/ebird";
-
+import { getHotspotsWithFallback } from "../utils/locationUtils";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import BirdImage from "../components/BirdImage";
@@ -28,44 +28,10 @@ export default function HotspotsPage() {
   };
 
   useEffect(() => {
-    const getHotspots = async () => {
-      try {
-        const coords = await new Promise<GeolocationCoordinates>(
-          (resolve, reject) => {
-            if (!navigator.geolocation) {
-              reject(new Error("Geolocation not supported."));
-            } else {
-              navigator.geolocation.getCurrentPosition(
-                (pos) => resolve(pos.coords),
-                () => reject(new Error("Location access denied."))
-              );
-            }
-          }
-        );
-
-        const lat = coords.latitude;
-        const lng = coords.longitude;
-        const data = await fetchHotspots(lat, lng, radius);
-        setHotspots(data);
-      } catch (err: any) {
-        // Fallback to Bangalore if denied or failed
-        const fallbackLat = 12.9716;
-        const fallbackLng = 77.5946;
-        try {
-          const data = await fetchHotspots(fallbackLat, fallbackLng, radius);
-          setHotspots(data);
-          setError(
-            (err.message || "Failed to load hotspots.") +
-              " Showing default (Bangalore) hotspots."
-          );
-        } catch {
-          setError("Failed to load hotspots.");
-        }
-      }
-    };
-
-    getHotspots();
-    // re-fetch when radius changes
+    getHotspotsWithFallback(radius).then(({ data, error }) => {
+      if (data) setHotspots(data);
+      if (error) setError(error);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [radius]);
 

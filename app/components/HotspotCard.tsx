@@ -3,13 +3,19 @@ type Props = {
   locId: string;
   lat: number;
   lng: number;
+  directionsUrl?: string;
   onClick?: () => void;
   children?: React.ReactNode;
 };
 
-export default function HotspotCard({ name, locId, lat, lng, onClick }: Props) {
-  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-
+export default function HotspotCard({
+  name,
+  locId,
+  lat,
+  lng,
+  directionsUrl,
+  onClick,
+}: Props) {
   return (
     <div
       className="border p-4 rounded shadow bg-white cursor-pointer hover:bg-gray-100"
