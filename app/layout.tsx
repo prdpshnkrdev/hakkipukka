@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Image from "next/image";
 import Link from "next/link";
+import HotspotSidebar from "./components/HotspotSideBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,8 +34,15 @@ export default function RootLayout({
           <header className="bg-white shadow sticky top-0 z-50">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
-                {/* Logo and Site Name */}
+                {/* Left: Logo */}
                 <div className="flex items-center space-x-2">
+                  <Image
+                    src="/logo.svg"
+                    alt="HakkiPukka Logo"
+                    width={60}
+                    height={60}
+                    className="rounded-full"
+                  />
                   <Link href="/">
                     <span className="text-xl font-bold text-green-800">
                       HakkiPukka
@@ -42,40 +50,25 @@ export default function RootLayout({
                   </Link>
                 </div>
 
-                {/* Center Nav Links */}
-                <nav className="hidden md:flex space-x-6 text-sm font-medium text-gray-700">
-                  <a href="#" className="hover:text-blue-600">
-                    Submit
-                  </a>
-                  <Link href="hotspots" className="hover:text-blue-600">
-                    Explore
-                  </Link>
-                  <Link href="#" className="hover:text-blue-600">
-                    My Birds
-                  </Link>
-                  <Link href="#" className="hover:text-blue-600">
-                    News
-                  </Link>
-                  <Link href="#" className="hover:text-blue-600">
-                    About
-                  </Link>
-                </nav>
+                {/* Center: Search and Radius */}
+                <div className="flex items-center space-x-2 flex-grow justify-center">
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="border border-gray-300 rounded px-2 py-1 w-1/2"
+                  />
+                  <select className="border border-gray-300 rounded px-2 py-1">
+                    <option value="10">10 km</option>
+                    <option value="25">25 km</option>
+                    <option value="50">50 km</option>
+                  </select>
+                </div>
 
-                {/* Right Utility Links */}
+                {/* Right: Placeholder for future links or icons */}
                 <div className="flex items-center space-x-2">
-                  {/* <a href="#" className="hover:text-blue-600">
-                    Help
-                  </a> */}
                   <a href="#" className="hover:text-blue-600">
                     Sign in
                   </a>
-                  <Image
-                    src="/logo.svg"
-                    alt="Logo"
-                    width={60}
-                    height={60}
-                    className="h-16 w-auto"
-                  />
                 </div>
               </div>
             </div>

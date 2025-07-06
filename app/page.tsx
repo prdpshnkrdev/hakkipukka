@@ -1,62 +1,29 @@
 import Image from "next/image";
+import HotspotSidebar from "./components/HotspotSideBar";
 
 export default function Home() {
   return (
     <>
-      {/* Hero Section */}
-      <section className="bg-green-600 text-gray-200 py-8 px-6 text-center flex flex-col items-center">
-        <div className="max-w-screen-xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-            Karnataka, India
-          </h1>
-          <div className="flex flex-wrap gap-4 text-sm sm:text-base mt-4">
-            <div>
-              📘 <strong>553</strong> Species
-            </div>
-            <div>
-              📋 <strong>470.5K</strong> Checklists
-            </div>
-            <div>
-              🧑‍🤝‍🧑 <strong>11,755</strong> eBirders
-            </div>
+      <main className="flex flex-grow">
+        {/* <aside className="w-1/4 bg-gray-100 p-4 overflow-y-auto">
+          <div className="text-sm text-gray-600 italic">
+            <HotspotSidebar />
           </div>
-        </div>
-      </section>
+        </aside> */}
 
-      {/* Content Section */}
-      <section className="w-full mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* India News */}
-        <div className="bg-white rounded shadow p-6">
-          <h2 className="text-xl font-semibold mb-2">India News</h2>
-          <div className="text-sm text-gray-600">What's On in July</div>
-          <p className="text-gray-700 mt-2">
-            While July might seem like a slower period for bird watching to some
-            enthusiasts, it’s actually a valuable time for expanding our
-            understanding of avian behavior. The monsoon rains bring notable
-            shifts in local bird populations.
-          </p>
-        </div>
+        <section className="flex-grow bg-green-50 p-4">
+          <div className="w-full h-full text-center text-green-700 italic">
+            [HotspotMap goes here]
+          </div>
+        </section>
 
-        {/* Community Targets */}
-        <div className="bg-white rounded shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">eBirding This Month</h2>
-          <ul className="space-y-3 text-sm">
-            <li>
-              🦅 <strong>White-eyed Buzzard</strong> - Last seen: 30 Jun 2025
-            </li>
-            <li>
-              🎶 <strong>Clamorous Reed Warbler</strong> - Last seen: 27 Jun
-              2025
-            </li>
-            <li>
-              🔥 <strong>Flame-throated Bulbul</strong> - Last seen: 27 Jun 2025
-            </li>
-            <li>
-              🟥 <strong>Red Spurfowl</strong> - Last seen: 29 Jun 2025
-            </li>
-          </ul>
-        </div>
-      </section>
+        {/* <aside className="w-1/4 bg-gray-100 p-4 overflow-y-auto">
+          <h2 className="font-semibold mb-2">Details</h2>
+          <div className="text-sm text-gray-600 italic">
+            [HotspotDetails goes here]
+          </div>
+        </aside> */}
+      </main>
     </>
   );
 }
