@@ -24,6 +24,12 @@ export default function HotspotsPage() {
   const [selectedSpecies, setSelectedSpecies] = useState<any[]>([]);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
 
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const MapUpdater = ({ center }: { center: [number, number] }) => {
     const map = useMap();
     useEffect(() => {
@@ -54,23 +60,42 @@ export default function HotspotsPage() {
     <section className="w-full p-2">
       {!error && hotspots.length === 0 && <p>Loading hotspots...</p>}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
         {/* Map Section - 2/3 width */}
-        <div className="md:col-span-2 h-[800px]">
-          <LeafletMap
-            hotspots={filteredHotspots}
-            selectedLocation={selectedLocation}
-            onSelectHotspot={async (lat, lng, locId) => {
-              setSelectedLocation([lat, lng]);
-              const species = await fetchSpeciesByHotspot(locId);
-              setSelectedSpecies(species);
-            }}
-          />
+        <div
+          className={`transition-all duration-500 ${
+            selectedLocation
+              ? "md:col-span-1 h-[400px]"
+              : "md:col-span-2 h-[800px]"
+          }`}
+        >
+          {hasMounted && (
+            <LeafletMap
+              key={selectedLocation ? "selected" : "default"}
+              hotspots={filteredHotspots}
+              selectedLocation={selectedLocation}
+              onSelectHotspot={async (
+                lat: number,
+                lng: number,
+                locId: string
+              ) => {
+                setSelectedLocation([lat, lng]);
+                const species = await fetchSpeciesByHotspot(locId);
+                setSelectedSpecies(species);
+              }}
+            />
+          )}
           {error && <p className="text-yellow-700">{error}</p>}
         </div>
 
         {/* Hotspot List Section - 1/3 width, scrollable */}
-        <div className="h-[800px] overflow-y-auto pr-2">
+        <div
+          className={`overflow-y-auto pr-2 transition-all duration-500 ${
+            selectedLocation
+              ? "md:col-span-2 h-[1040px]"
+              : "md:col-span-1 h-[800px]"
+          }`}
+        >
           <div className="space-y-4">
             <div className="flex flex-wrap gap-4 mb-6">
               <div>

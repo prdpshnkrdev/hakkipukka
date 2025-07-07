@@ -39,6 +39,7 @@ export default function LeafletMap({
 
   return (
     <MapContainer
+      key={selectedLocation ? "selected" : "default"}
       center={center}
       zoom={12}
       scrollWheelZoom={true}
