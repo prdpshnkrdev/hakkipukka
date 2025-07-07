@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import HotspotCard from "./components/HotspotCard";
 import { fetchSpeciesByHotspot } from "./lib/ebird";
 import { getHotspotsWithFallback } from "./utils/locationUtils";
@@ -23,8 +23,36 @@ export default function HotspotsPage() {
   const [search, setSearch] = useState<string>("");
   const [selectedSpecies, setSelectedSpecies] = useState<any[]>([]);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [weather, setWeather] = useState<any>(null);
 
   const [hasMounted, setHasMounted] = useState(false);
+  const apiKey = process.env.NEXT_PUBLIC_OWM_API_KEY;
+
+  // Fetch 3-day weather forecast when selectedLocation changes
+  useEffect(() => {
+    if (!selectedLocation) return;
+
+    const fetchWeather = async () => {
+      try {
+        const [lat, lon] = selectedLocation;
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+        );
+        const data = await res.json();
+
+        // Filter for one forecast per day at 12:00
+        const dailyForecast = data.list
+          .filter((entry: any) => entry.dt_txt.includes("12:00:00"))
+          .slice(0, 3); // Take only next 3 days
+
+        setWeather(dailyForecast);
+      } catch (err) {
+        console.error("Failed to fetch weather", err);
+      }
+    };
+
+    fetchWeather();
+  }, [selectedLocation]);
 
   useEffect(() => {
     setHasMounted(true);
@@ -87,6 +115,33 @@ export default function HotspotsPage() {
           )}
           {error && <p className="text-yellow-700">{error}</p>}
         </div>
+        {selectedLocation && (
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded">
+            <h3 className="text-lg font-semibold mb-2">Weather Forecast</h3>
+            <p className="text-sm text-gray-700">
+              Weather for coordinates: {selectedLocation[0]},{" "}
+              {selectedLocation[1]}
+            </p>
+            {weather ? (
+              <div className="mt-2 text-gray-800 space-y-2">
+                {weather.map((entry: any, index: number) => (
+                  <div key={index} className="border-b pb-2">
+                    <p className="font-semibold">
+                      📅 {new Date(entry.dt_txt).toLocaleDateString()}
+                    </p>
+                    <p>🌡 Temp: {entry.main.temp}°C</p>
+                    <p>☁ {entry.weather[0].description}</p>
+                    <p>💨 Wind: {entry.wind.speed} m/s</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 italic text-gray-500">
+                Fetching 3-day forecast...
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Hotspot List Section - 1/3 width, scrollable */}
         <div
