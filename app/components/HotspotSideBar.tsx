@@ -32,7 +32,7 @@ export default function HotspotSidebar({ radius = 25 }: { radius?: number }) {
   }, [radius]);
 
   return (
-    <div className="h-[100px] overflow-y-auto pr-2">
+    <div className="h-[400px] overflow-y-auto pr-2">
       <h2 className="font-semibold mb-2">Nearby Hotspots</h2>
       <ul className="space-y-2 text-sm">
         {hotspots.length > 0 ? (

@@ -28,9 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} w-screen h-screen overflow-hidden flex flex-col`}
       >
-        <div className="flex-grow">
+        <div className="flex flex-col h-full">
           <header className="bg-white shadow sticky top-0 z-50">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
@@ -73,13 +73,13 @@ export default function RootLayout({
               </div>
             </div>
           </header>
-          {children}
+          <main className="flex-grow overflow-auto max-h-full">{children}</main>
+          <footer className="bg-gray-200">
+            <p className="text-center p-4">
+              © {new Date().getFullYear()} HakkiPukka 🐦
+            </p>
+          </footer>
         </div>
-        <footer>
-          <p className="text-center p-4 bg-gray-200">
-            © {new Date().getFullYear()} HakkiPukka 🐦
-          </p>
-        </footer>
       </body>
     </html>
   );
