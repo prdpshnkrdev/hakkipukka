@@ -2,16 +2,13 @@
 
 import { useEffect, useState } from "react";
 import HotspotCard from "./components/HotspotCard";
-import { fetchHotspots, fetchSpeciesByHotspot } from "./lib/ebird";
+import { fetchSpeciesByHotspot } from "./lib/ebird";
 import { getHotspotsWithFallback } from "./utils/locationUtils";
 import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import BirdImage from "./components/BirdImage";
 import dynamic from "next/dynamic";
-// Dynamically import LeafletMap to avoid SSR issues
-// This is necessary because Leaflet relies on the DOM, which is not available during server-side rendering
-// If you want to use LeafletMap directly, you can import it like this:
-// import LeafletMap from './components/LeafletMap';
+
 const LeafletMap = dynamic(() => import("./components/LeafletMap"), {
   ssr: false,
 });
@@ -55,33 +52,21 @@ export default function HotspotsPage() {
 
   return (
     <section className="w-full p-2">
-      {error && <p className="text-yellow-700">{error}</p>}
       {!error && hotspots.length === 0 && <p>Loading hotspots...</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Map Section - 2/3 width */}
         <div className="md:col-span-2 h-[800px]">
-          {/* <MapContainer
-            center={center}
-            zoom={12}
-            scrollWheelZoom={true}
-            className="h-full w-full z-0"
-          >
-            <TileLayer
-              attribution="&copy; OpenStreetMap contributors"
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {filteredHotspots.map((spot) => (
-              <Marker key={spot.locId} position={[spot.lat, spot.lng]}>
-                <Popup>{spot.locName}</Popup>
-              </Marker>
-            ))}
-            {selectedLocation && <MapUpdater center={selectedLocation} />}
-          </MapContainer> */}
           <LeafletMap
             hotspots={filteredHotspots}
             selectedLocation={selectedLocation}
+            onSelectHotspot={async (lat, lng, locId) => {
+              setSelectedLocation([lat, lng]);
+              const species = await fetchSpeciesByHotspot(locId);
+              setSelectedSpecies(species);
+            }}
           />
+          {error && <p className="text-yellow-700">{error}</p>}
         </div>
 
         {/* Hotspot List Section - 1/3 width, scrollable */}
@@ -112,72 +97,70 @@ export default function HotspotsPage() {
                 />
               </div>
             </div>
-            {filteredHotspots.map((spot: any) => (
-              <div key={spot.locId}>
-                <HotspotCard
-                  name={spot.locName}
-                  locId={spot.locId}
-                  lat={spot.lat}
-                  lng={spot.lng}
-                  directionsUrl={`https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`}
-                  onClick={async () => {
-                    setSelectedLocation([spot.lat, spot.lng]);
-                    const species = await fetchSpeciesByHotspot(spot.locId);
-                    console.log("Fetched species:", species);
-                    setSelectedSpecies(species);
-                    setModalOpen(true);
+            {selectedLocation && (
+              <div className="mb-4">
+                <button
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                  onClick={() => {
+                    setSelectedLocation(null);
+                    setSelectedSpecies([]);
                   }}
-                />
+                >
+                  ← Back to All Hotspots
+                </button>
               </div>
-            ))}
+            )}
+            {filteredHotspots.map((spot: any) => {
+              const isSelected =
+                selectedLocation?.[0] === spot.lat &&
+                selectedLocation?.[1] === spot.lng;
+
+              if (!isSelected && selectedLocation) return null;
+
+              return (
+                <div key={spot.locId}>
+                  <HotspotCard
+                    name={spot.locName}
+                    locId={spot.locId}
+                    lat={spot.lat}
+                    lng={spot.lng}
+                    directionsUrl={`https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`}
+                    onClick={async () => {
+                      setSelectedLocation([spot.lat, spot.lng]);
+                      const species = await fetchSpeciesByHotspot(spot.locId);
+                      setSelectedSpecies(species);
+                    }}
+                  />
+                  {isSelected && (
+                    <div className="mt-4 p-4 border rounded bg-white shadow">
+                      <h2 className="text-xl font-bold mb-2">
+                        Species seen at {spot.locName}
+                      </h2>
+                      {selectedSpecies.length > 0 ? (
+                        <ul className="list-disc list-inside space-y-1 max-h-96 overflow-y-auto">
+                          {selectedSpecies.map((s: any) => (
+                            <li
+                              key={s.speciesCode}
+                              className="flex items-center gap-3"
+                            >
+                              <BirdImage comName={s.comName} />
+                              <span>{s.comName}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-gray-600">
+                          No species data available at this location.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full shadow-lg">
-            <h2 className="text-xl font-bold mb-4">
-              Species seen at{" "}
-              {
-                filteredHotspots.find(
-                  (h) =>
-                    [h.lat, h.lng].toString() === selectedLocation?.toString()
-                )?.locName
-              }
-            </h2>
-            {selectedSpecies.length > 0 ? (
-              <ul className="list-disc list-inside space-y-1 max-h-96 overflow-y-auto">
-                {selectedSpecies.map((s: any) => (
-                  <li key={s.speciesCode} className="flex items-center gap-3">
-                    <BirdImage comName={s.comName} />
-                    <span>{s.comName}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-600">
-                No species data available at this location.
-              </p>
-            )}
-            <div className="mt-6 text-right">
-              <button
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                onClick={() => setModalOpen(false)}
-              >
-                Close
-              </button>
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${selectedLocation?.[0]},${selectedLocation?.[1]}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ml-4 inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              >
-                Get Directions
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }
