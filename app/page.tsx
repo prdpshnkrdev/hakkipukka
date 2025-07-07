@@ -7,6 +7,14 @@ import { getHotspotsWithFallback } from "./utils/locationUtils";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import BirdImage from "./components/BirdImage";
+import dynamic from "next/dynamic";
+// Dynamically import LeafletMap to avoid SSR issues
+// This is necessary because Leaflet relies on the DOM, which is not available during server-side rendering
+// If you want to use LeafletMap directly, you can import it like this:
+// import LeafletMap from './components/LeafletMap';
+const LeafletMap = dynamic(() => import("./components/LeafletMap"), {
+  ssr: false,
+});
 
 export default function HotspotsPage() {
   const [hotspots, setHotspots] = useState<any[]>([]);
@@ -53,7 +61,7 @@ export default function HotspotsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Map Section - 2/3 width */}
         <div className="md:col-span-2 h-[800px]">
-          <MapContainer
+          {/* <MapContainer
             center={center}
             zoom={12}
             scrollWheelZoom={true}
@@ -69,7 +77,11 @@ export default function HotspotsPage() {
               </Marker>
             ))}
             {selectedLocation && <MapUpdater center={selectedLocation} />}
-          </MapContainer>
+          </MapContainer> */}
+          <LeafletMap
+            hotspots={filteredHotspots}
+            selectedLocation={selectedLocation}
+          />
         </div>
 
         {/* Hotspot List Section - 1/3 width, scrollable */}
